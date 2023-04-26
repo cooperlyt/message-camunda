@@ -1,4 +1,4 @@
-package cc.coopersoft.construction.data.work;
+package cc.coopersoft.cloud.message;
 
 /**
  * 变更不对业务，只对具体数据

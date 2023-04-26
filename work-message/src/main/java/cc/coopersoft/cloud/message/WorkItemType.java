@@ -1,4 +1,4 @@
-package cc.coopersoft.construction.data.work;
+package cc.coopersoft.cloud.message;
 
 public enum WorkItemType {
   WORKER, //操作人

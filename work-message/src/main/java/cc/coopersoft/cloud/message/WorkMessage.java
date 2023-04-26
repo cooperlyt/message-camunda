@@ -1,4 +1,4 @@
-package cc.coopersoft.construction.data.work;
+package cc.coopersoft.cloud.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
