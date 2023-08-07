@@ -1,13 +1,13 @@
 package cc.coopersoft.cloud.camunda.messages;
 
-import cc.coopersoft.cloud.camunda.Constants;
+import cc.coopersoft.cloud.message.WorkCreateMessage;
+import cc.coopersoft.cloud.message.WorkMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 
-import java.util.Collections;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -23,17 +23,18 @@ public class CreateListener {
 //  process_project_license
 
   @Bean
-  public Consumer<Message<String>> processCreateChannel() {
+  public Consumer<Message<WorkCreateMessage>> processCreateChannel() {
     return msg -> {
-       var arg = msg.getHeaders();
-       String workId = String.valueOf(arg.get(Constants.WORK_KEY_NAME, Long.class));
-       String define = arg.get(Constants.DEFINE_KEY_NAME,String.class);
-//      approval
-      runtimeService.startProcessInstanceById(msg.getPayload(),workId,workId,
-          Collections.singletonMap(Constants.DEFINE_KEY_NAME,define));
-
+      var arg = msg.getHeaders();
       log.info(Thread.currentThread().getName() + " Receive New Messages: " + msg.getPayload()+ " ARG:"
           + arg);
+      String define = msg.getHeaders().get(WorkMessage.MESSAGE_HEADER_WORK_DEFINE, String.class);
+      String workId = String.valueOf(msg.getPayload().getWorkId());
+
+//      approval
+      runtimeService.startProcessInstanceByKey(define,workId,workId,msg.getPayload().getData());
+
+
     };
   }
 

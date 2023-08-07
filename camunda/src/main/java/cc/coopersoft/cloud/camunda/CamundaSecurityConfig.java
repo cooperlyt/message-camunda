@@ -22,8 +22,17 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.context.request.RequestContextListener;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.filter.ForwardedHeaderFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.util.pattern.PathPatternParser;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -33,6 +42,64 @@ import java.util.Collections;
 @EnableWebSecurity
 @Order(SecurityProperties.BASIC_AUTH_ORDER - 20)
 public class CamundaSecurityConfig {
+
+//  @Bean
+//  public FilterRegistrationBean processCorsFilter() {
+//    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//    CorsConfiguration config = new CorsConfiguration();
+//    config.setAllowCredentials(true);
+//    config.addAllowedOriginPattern("*");
+//    config.addAllowedHeader("*");
+//    config.addAllowedMethod("*");
+//    source.registerCorsConfiguration("/**", config);
+//
+//    FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+//    bean.setOrder(0);
+//    return bean;
+//  }
+//
+//  @Bean
+//  public WebMvcConfigurer corsConfigurer() {
+//    return new WebMvcConfigurerAdapter() {
+//      @Override
+//      public void addCorsMappings(CorsRegistry registry) {
+//        registry.addMapping("/**")
+//            .allowedMethods("POST", "GET", "PUT", "DELETE", "HEAD")
+//            .allowedOrigins("*")
+//            .allowCredentials(false);
+//      }
+//    };
+//  }
+
+//  @Bean
+  CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.addAllowedOriginPattern("*");
+
+    //configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+    configuration.setAllowedMethods(Arrays.asList("GET","POST","PATCH", "PUT", "DELETE", "OPTIONS", "HEAD"));
+//    configuration.setAllowCredentials(true);
+    configuration.setAllowedHeaders(Arrays.asList("*"));
+    configuration.setExposedHeaders(Arrays.asList("*"));
+    //configuration.addExposedHeader("Location");
+    //configuration.setMaxAge(3600L);
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+  }
+
+//  @Bean
+//  public CorsWebFilter corsFilter() {
+//    CorsConfiguration config = new CorsConfiguration();
+//    config.addAllowedMethod("*");
+//    config.addAllowedOrigin("*");
+//    config.addAllowedHeader("*");
+//
+//    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource(new PathPatternParser());
+//    source.registerCorsConfiguration("/**", config);
+//
+//    return new CorsWebFilter(source);
+//  }
 
   private final KeycloakLogoutHandler keycloakLogoutHandler;
 
@@ -71,7 +138,7 @@ public class CamundaSecurityConfig {
     String jwkSetUri = applicationContext.getEnvironment().getRequiredProperty(
         "spring.security.oauth2.client.provider." + configProps.getProvider() + ".jwk-set-uri");
 
-    http
+    http.cors().configurationSource(corsConfigurationSource()).and()
         .csrf().ignoringAntMatchers("/api/**", "/engine-rest/**");
 
     http.antMatcher("/engine-rest/**")

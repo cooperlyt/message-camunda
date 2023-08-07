@@ -28,17 +28,12 @@
         <bpmn:flowNodeRef>Gateway_04rcnn2</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
-    <bpmn:userTask id="Activity_0uru4zn" name="初审" camunda:candidateGroups="camunda-project-license-first">
+    <bpmn:userTask id="Activity_0uru4zn" name="初审" camunda:formKey="check" camunda:candidateGroups="camunda-project-license-first">
+      <bpmn:documentation>${developerName} - ${projectName}(${buildsName})</bpmn:documentation>
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:outputParameter name="approval">${task_approval}</camunda:outputParameter>
         </camunda:inputOutput>
-        <camunda:formData>
-          <camunda:formField id="task_approval" label="初审通过" type="boolean" defaultValue="true">
-            <camunda:properties />
-            <camunda:validation />
-          </camunda:formField>
-        </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0e3gdzw</bpmn:incoming>
       <bpmn:outgoing>Flow_1y89whv</bpmn:outgoing>
@@ -70,7 +65,8 @@
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approval == false}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0vri55t" sourceRef="Activity_0jjm1a3" targetRef="Event_1irqvmy" />
-    <bpmn:userTask id="Activity_1rdz8jz" name="审批">
+    <bpmn:userTask id="Activity_1rdz8jz" name="审批" camunda:formKey="check">
+      <bpmn:documentation>${developerName} - ${projectName}(${buildsName})</bpmn:documentation>
       <bpmn:incoming>Flow_0yqv7dl</bpmn:incoming>
       <bpmn:outgoing>Flow_1tey8d8</bpmn:outgoing>
     </bpmn:userTask>
@@ -92,7 +88,8 @@
     <bpmn:endEvent id="Event_0mxy1v1">
       <bpmn:incoming>Flow_0rj23th</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:userTask id="Activity_15ber4w" name="发证">
+    <bpmn:userTask id="Activity_15ber4w" name="发证" camunda:formKey="check">
+      <bpmn:documentation>${developerName} - ${projectName}(${buildsName})</bpmn:documentation>
       <bpmn:incoming>Flow_07rvzmo</bpmn:incoming>
       <bpmn:outgoing>Flow_0rj23th</bpmn:outgoing>
     </bpmn:userTask>
@@ -106,7 +103,9 @@
       <bpmn:incoming>Flow_1hamzm9</bpmn:incoming>
       <bpmn:outgoing>Flow_07rvzmo</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:userTask id="Activity_1rev063" name="复审">
+    <bpmn:userTask id="Activity_1rev063" name="复审" camunda:formKey="check">
+      <bpmn:documentation>${developerName} - ${projectName}(${buildsName})</bpmn:documentation>
+      <bpmn:extensionElements />
       <bpmn:incoming>Flow_1txggax</bpmn:incoming>
       <bpmn:outgoing>Flow_0q8d6ko</bpmn:outgoing>
     </bpmn:userTask>
