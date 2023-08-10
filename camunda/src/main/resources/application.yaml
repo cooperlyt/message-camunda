@@ -23,6 +23,7 @@ camunda.bpm:
     skippable: true
   historyLevel: audit
   database:
+    jdbcBatchProcessing: false
     schema-update: drop-create
     type: mariadb
 #  webapp:
@@ -118,6 +119,10 @@ spring:
           destination: topic-process-change
           content-type: application/json
           group: group-camunda
+        statusChangeChannel-out-0:
+          destination: topic-status-change
+          content-type: application/json
+          group: group-camunda
 
       rocketmq:
         binder:
@@ -126,12 +131,15 @@ spring:
           processCreateChannel-in-0:
             consumer:
               subscription: sql:(type = 'RUNNING')
+          statusChangeChannel-out-0:
+            producer:
+              group: group-camunda
           processChangeChannel-out-0:
             producer:
               group: group-camunda
-              transactionListener: processStatusChangeTransactionListener
-              producerType: Trans
-              sendMessageTimeout: 60000
+#              transactionListener: processStatusChangeTransactionListener
+#              producerType: Trans
+#              sendMessageTimeout: 60000
   jersey:
     applicationPath: /engine-rest
   security:

@@ -17,4 +17,8 @@ public class WorkChangeMessage extends WorkMessage implements java.io.Serializab
   private WorkItemType type;
 
   private String message;
+
+  private String taskName;
+
+  private String taskId;
 }

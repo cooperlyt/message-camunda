@@ -21,7 +21,6 @@ public class CreateListener {
   }
 
 //  process_project_license
-
   @Bean
   public Consumer<Message<WorkCreateMessage>> processCreateChannel() {
     return msg -> {
