@@ -21,4 +21,6 @@ public class WorkChangeMessage extends WorkMessage implements java.io.Serializab
   private String taskName;
 
   private String taskId;
+
+  private boolean pass;
 }

@@ -8,5 +8,5 @@ public enum WorkItemType {
   FIRST_CHECK, // 初审
   SECOND_CHECK,//复初
   CHECKED, // 审批
-  VALID //盖章
+  VALID //签发
 }

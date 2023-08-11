@@ -1,4 +1,4 @@
-package cc.coopersoft.cloud.camunda.messages;
+package cc.coopersoft.cloud.camunda.mq;
 
 import cc.coopersoft.cloud.camunda.Constants;
 import cc.coopersoft.cloud.message.StatusChangeMessage;

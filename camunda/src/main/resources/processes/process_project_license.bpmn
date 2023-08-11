@@ -31,9 +31,9 @@
     <bpmn:userTask id="Activity_0uru4zn" name="初审" camunda:formKey="check" camunda:candidateGroups="camunda-project-license-first">
       <bpmn:documentation>${developerName} - ${projectName}(${buildsName})</bpmn:documentation>
       <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="type">FIRST_CHECK</camunda:inputParameter>
-        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="type" value="FIRST_CHECK" />
+        </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0e3gdzw</bpmn:incoming>
       <bpmn:outgoing>Flow_1y89whv</bpmn:outgoing>
@@ -65,12 +65,12 @@
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approval == false}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0vri55t" sourceRef="Activity_0jjm1a3" targetRef="Event_1irqvmy" />
-    <bpmn:userTask id="Activity_1rdz8jz" name="审批" camunda:formKey="check">
+    <bpmn:userTask id="Activity_1rdz8jz" name="审批" camunda:formKey="check" camunda:candidateGroups="camunda-project-license-last">
       <bpmn:documentation>${developerName} - ${projectName}(${buildsName})</bpmn:documentation>
       <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="type">CHECKED</camunda:inputParameter>
-        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="type" value="CHECKED" />
+        </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0yqv7dl</bpmn:incoming>
       <bpmn:outgoing>Flow_1tey8d8</bpmn:outgoing>
@@ -91,14 +91,17 @@
       <bpmn:terminateEventDefinition id="TerminateEventDefinition_0zf9mu4" />
     </bpmn:endEvent>
     <bpmn:endEvent id="Event_0mxy1v1">
+      <bpmn:extensionElements>
+        <camunda:executionListener class="cc.coopersoft.cloud.camunda.listener.CompleteListener" event="end" />
+      </bpmn:extensionElements>
       <bpmn:incoming>Flow_0rj23th</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:userTask id="Activity_15ber4w" name="发证" camunda:formKey="check">
+    <bpmn:userTask id="Activity_15ber4w" name="发证" camunda:formKey="project-license-print" camunda:candidateGroups="camunda-project-license-print">
       <bpmn:documentation>${developerName} - ${projectName}(${buildsName})</bpmn:documentation>
       <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="type">VALID</camunda:inputParameter>
-        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="type" value="VALID" />
+        </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_07rvzmo</bpmn:incoming>
       <bpmn:outgoing>Flow_0rj23th</bpmn:outgoing>
@@ -113,12 +116,12 @@
       <bpmn:incoming>Flow_1hamzm9</bpmn:incoming>
       <bpmn:outgoing>Flow_07rvzmo</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:userTask id="Activity_1rev063" name="复审" camunda:formKey="check">
+    <bpmn:userTask id="Activity_1rev063" name="复审" camunda:formKey="check" camunda:candidateGroups="camunda-project-license-second">
       <bpmn:documentation>${developerName} - ${projectName}(${buildsName})</bpmn:documentation>
       <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="type">SECOND_CHECK</camunda:inputParameter>
-        </camunda:inputOutput>
+        <camunda:properties>
+          <camunda:property name="type" value="SECOND_CHECK" />
+        </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1txggax</bpmn:incoming>
       <bpmn:outgoing>Flow_0q8d6ko</bpmn:outgoing>

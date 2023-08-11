@@ -1,5 +1,6 @@
-package cc.coopersoft.cloud.camunda.messages;
+package cc.coopersoft.cloud.camunda.listener;
 
+import cc.coopersoft.cloud.camunda.mq.ProcessChangeService;
 import cc.coopersoft.cloud.message.WorkChangeMessage;
 import cc.coopersoft.cloud.message.WorkItemType;
 import lombok.extern.slf4j.Slf4j;
@@ -12,10 +13,17 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.model.bpmn.instance.BaseElement;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperties;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaProperty;
 import org.camunda.bpm.spring.boot.starter.event.ExecutionEvent;
 import org.camunda.bpm.spring.boot.starter.event.TaskEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+
+import java.util.Collection;
+import java.util.Optional;
+
 
 @Slf4j
 @Component
@@ -38,6 +46,12 @@ public class CamundaListener {
     this.identityService = identityService;
   }
 
+  private Collection<CamundaProperty> getCamundaProperties(String processDefinitionId, String taskDefinitionKey){
+
+    BaseElement element = repositoryService.getBpmnModelInstance(processDefinitionId).getModelElementById(taskDefinitionKey);
+    return element.getExtensionElements().getElementsQuery().filterByType(CamundaProperties.class).singleResult().getCamundaProperties();
+  }
+
   @EventListener
   public void onTaskEvent(DelegateTask taskDelegate) {
     log.debug("mutable task event by taskDelegate: {}", taskDelegate.getEventName());
@@ -48,49 +62,41 @@ public class CamundaListener {
   public void onTaskEvent(TaskEvent taskEvent) {
     log.debug("immutable task event: {} by TaskEvent", taskEvent.getEventName());
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionId(taskEvent.getProcessDefinitionId())
-        .singleResult();
+    getCamundaProperties(taskEvent.getProcessDefinitionId(),taskEvent.getTaskDefinitionKey())
+        .stream().filter(p -> p.getCamundaName().equals("type")).findFirst()
+        .ifPresent(type -> {
 
-    Task task = taskService.createTaskQuery().taskId(taskEvent.getId()).initializeFormKeys().singleResult();
+          log.info("taskEvent by type: {}", type.getCamundaValue());
 
-    User user = identityService.createUserQuery().userId(taskEvent.getAssignee()).singleResult();
+          ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+              .processDefinitionId(taskEvent.getProcessDefinitionId())
+              .singleResult();
 
-    try {
-      processChangeService.processChange(WorkChangeMessage.builder()
-              .message((String) taskService.getVariable(taskEvent.getId(),"message"))
-              .workId(Long.parseLong(taskEvent.getId()))
-              .empId(taskEvent.getAssignee())
-              .empName(user.getFirstName() + user.getLastName())
-              .orgId(0L)
-              .taskName(task.getName())
-              .taskId(taskEvent.getId())
-              .type(WorkItemType.valueOf((String) taskService.getVariable(taskEvent.getId(),"type")))
-              .build(),
-            processDefinition.getId());
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+          Task task = taskService.createTaskQuery().taskId(taskEvent.getId()).initializeFormKeys().singleResult();
 
-//    log.debug("       task Assignee: {} by TaskEvent", taskEvent.getAssignee());
-//
-//
-//    taskEvent.getAssignee();
-//
-//
-//    if (task != null){
-//      log.debug("      task FormKey: {} by TaskEvent", task.getFormKey());
-//      //task.getFormKey();
-//
-//      taskService.getVariableLocal(taskEvent.getId(),"type");
-//
-//      log.debug("      taskEvent id: {} == {} by TaskEvent", taskEvent.getId(),task.getId());
-//      log.debug("      task variable message: {} by TaskEvent", taskService.getVariableLocal(taskEvent.getId(),"message"));
-//
-//      log.debug("      task variable type: {} by TaskEvent", taskService.getVariable(taskEvent.getId(),"type"));
-//      // handle immutable task event
-//    }
+          User user = identityService.createUserQuery().userId(taskEvent.getAssignee()).singleResult();
 
+          boolean pass = Optional.ofNullable(taskService.getVariable(taskEvent.getId(),"approval"))
+              .map(approval -> (Boolean)approval)
+              .orElse(true);
+
+          try {
+            processChangeService.processChange(WorkChangeMessage.builder()
+                    .message((String) taskService.getVariable(taskEvent.getId(),"message"))
+                    .pass(pass)
+                    .workId(Long.parseLong(taskEvent.getCaseInstanceId()))
+                    .empId(taskEvent.getAssignee())
+                    .empName(user.getFirstName() + user.getLastName())
+                    .orgId(0L)
+                    .taskName(task.getName())
+                    .taskId(taskEvent.getId())
+                    .type(WorkItemType.valueOf(type.getCamundaValue()))
+                    .build(),
+                processDefinition.getId());
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
   }
 
   @EventListener

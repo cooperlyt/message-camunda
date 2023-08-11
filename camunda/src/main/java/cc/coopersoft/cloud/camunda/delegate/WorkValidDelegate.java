@@ -1,6 +1,6 @@
 package cc.coopersoft.cloud.camunda.delegate;
 
-import cc.coopersoft.cloud.camunda.messages.ProcessChangeService;
+import cc.coopersoft.cloud.camunda.mq.ProcessChangeService;
 import cc.coopersoft.cloud.message.WorkStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;

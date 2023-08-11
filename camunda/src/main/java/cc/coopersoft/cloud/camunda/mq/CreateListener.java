@@ -1,4 +1,4 @@
-package cc.coopersoft.cloud.camunda.messages;
+package cc.coopersoft.cloud.camunda.mq;
 
 import cc.coopersoft.cloud.message.WorkCreateMessage;
 import cc.coopersoft.cloud.message.WorkMessage;
