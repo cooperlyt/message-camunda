@@ -238,6 +238,9 @@ spring:
       on-profile: prod
     import: optional:consul:${spring.cloud.consul.host}:${spring.cloud.consul.port}
 
+camunda.bpm:
+  database:
+    schema-update: false
 
 logging:
   level:
