@@ -227,7 +227,6 @@ spring:
   config:
     activate:
       on-profile: dev
-    import: optional:consul:${spring.cloud.consul.host}:${spring.cloud.consul.port}
 
 
 ---
@@ -236,7 +235,6 @@ spring:
   config:
     activate:
       on-profile: prod
-    import: optional:consul:${spring.cloud.consul.host}:${spring.cloud.consul.port}
 
 camunda.bpm:
   database:
