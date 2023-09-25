@@ -2,7 +2,6 @@ package cc.coopersoft.cloud.camunda.listener;
 
 import cc.coopersoft.cloud.camunda.mq.ProcessChangeService;
 import cc.coopersoft.cloud.message.WorkChangeMessage;
-import cc.coopersoft.cloud.message.WorkItemType;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.RepositoryService;
@@ -62,41 +61,39 @@ public class CamundaListener {
   public void onTaskEvent(TaskEvent taskEvent) {
     log.debug("immutable task event: {} by TaskEvent", taskEvent.getEventName());
 
-    getCamundaProperties(taskEvent.getProcessDefinitionId(),taskEvent.getTaskDefinitionKey())
-        .stream().filter(p -> p.getCamundaName().equals("type")).findFirst()
-        .ifPresent(type -> {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionId(taskEvent.getProcessDefinitionId())
+        .singleResult();
 
-          log.info("taskEvent by type: {}", type.getCamundaValue());
+    Task task = taskService.createTaskQuery().taskId(taskEvent.getId()).initializeFormKeys().singleResult();
 
-          ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-              .processDefinitionId(taskEvent.getProcessDefinitionId())
-              .singleResult();
+    User user = identityService.createUserQuery().userId(taskEvent.getAssignee()).singleResult();
 
-          Task task = taskService.createTaskQuery().taskId(taskEvent.getId()).initializeFormKeys().singleResult();
+    boolean pass = Optional.ofNullable(taskService.getVariable(taskEvent.getId(),"approval"))
+        .map(approval -> (Boolean)approval)
+        .orElse(true);
 
-          User user = identityService.createUserQuery().userId(taskEvent.getAssignee()).singleResult();
+    try {
+      processChangeService.processChange(WorkChangeMessage.builder()
+              .message((String) taskService.getVariable(taskEvent.getId(),"message"))
+              .pass(pass)
+              .workId(Long.parseLong(taskEvent.getCaseInstanceId()))
+              .empId(taskEvent.getAssignee())
+              .empName(user.getFirstName() + user.getLastName())
+              .taskName(task.getName())
+              .taskId(taskEvent.getId())
+              .build(),
+          processDefinition.getId());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
 
-          boolean pass = Optional.ofNullable(taskService.getVariable(taskEvent.getId(),"approval"))
-              .map(approval -> (Boolean)approval)
-              .orElse(true);
 
-          try {
-            processChangeService.processChange(WorkChangeMessage.builder()
-                    .message((String) taskService.getVariable(taskEvent.getId(),"message"))
-                    .pass(pass)
-                    .workId(Long.parseLong(taskEvent.getCaseInstanceId()))
-                    .empId(taskEvent.getAssignee())
-                    .empName(user.getFirstName() + user.getLastName())
-                    .orgId(0L)
-                    .taskName(task.getName())
-                    .taskId(taskEvent.getId())
-                    .type(WorkItemType.valueOf(type.getCamundaValue()))
-                    .build(),
-                processDefinition.getId());
-          } catch (Exception e) {
-            throw new RuntimeException(e);
-          }
-        });
+//    getCamundaProperties(taskEvent.getProcessDefinitionId(),taskEvent.getTaskDefinitionKey())
+//        .stream().filter(p -> p.getCamundaName().equals("type")).findFirst()
+//        .ifPresent(type -> {
+//
+//        });
   }
 
   @EventListener

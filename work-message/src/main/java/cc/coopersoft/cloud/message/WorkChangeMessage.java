@@ -14,7 +14,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class WorkChangeMessage extends WorkMessage implements java.io.Serializable{
 
-  private WorkItemType type;
 
   private String message;
 

@@ -4,9 +4,9 @@ import java.util.EnumSet;
 
 public enum WorkStatus {
 
-  PREPARE(false), //准备中
-  PRIVATE(false), //私有的，只有本人或本组可以看到
-
+//  PREPARE(false), //准备中
+//  PRIVATE(false), //私有的，只有本人或本组可以看到
+//
   RUNNING(false), //运行中
 
   COMPLETED(true), //已完成
@@ -16,11 +16,11 @@ public enum WorkStatus {
   ABORT(false), //业务未完成，被中止
   DELETED(false); //业务已完成，后被删除
 
-  static EnumSet<WorkStatus> create = EnumSet.of(PREPARE,PRIVATE,RUNNING,COMPLETED);
+//  static final EnumSet<WorkStatus> create = EnumSet.of(PREPARE,PRIVATE,RUNNING,COMPLETED);
+//
+//  static final EnumSet<WorkStatus> change = EnumSet.of(VALID,COMPLETED,REJECT,ABORT,DELETED);
 
-  static EnumSet<WorkStatus> change = EnumSet.of(VALID,COMPLETED,REJECT,ABORT,DELETED);
-
-  public boolean valid;
+  public final boolean valid;
 
   WorkStatus(boolean valid) {
     this.valid = valid;
