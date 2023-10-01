@@ -19,8 +19,9 @@ public class ProcessChangeService {
     this.streamBridge = streamBridge;
   }
 
-  public void statusChange(Long workId, WorkStatus status) throws Exception {
+  public void statusChange(Long workId, WorkStatus status,String define) throws Exception {
     var msg = MessageBuilder.withPayload(StatusChangeMessage.builder().status(status).workId(workId).build())
+        .setHeader(Constants.DEFINE_KEY_NAME,define)
         .build();
     if (!streamBridge.send("statusChangeChannel-out-0",msg)){
       throw new Exception("message send fail!");
