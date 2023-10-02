@@ -16,8 +16,6 @@ public class CompleteListener implements ExecutionListener {
   @Autowired
   private ProcessChangeService processChangeService;
 
-  @Autowired
-  private RepositoryService repositoryService;
 
   public CompleteListener() {
     BeanInjectionHelper.autowireBean(this);
@@ -26,12 +24,8 @@ public class CompleteListener implements ExecutionListener {
   @Override
   public void notify(DelegateExecution execution) throws Exception {
     log.info("complete listener process: {}", execution.getProcessBusinessKey());
-
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionId(execution.getProcessDefinitionId())
-        .singleResult();
-
+    
     processChangeService.statusChange(Long.parseLong(execution.getProcessBusinessKey()),
-        WorkStatus.COMPLETED, processDefinition.getId());
+        WorkStatus.COMPLETED, execution.getProcessDefinitionId());
   }
 }

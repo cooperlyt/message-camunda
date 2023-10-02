@@ -19,17 +19,11 @@ public class WorkRejectDelegate implements JavaDelegate {
   @Autowired
   private ProcessChangeService processChangeService;
 
-  @Autowired
-  private RepositoryService repositoryService;
-
   @Override
   public void execute(DelegateExecution delegateExecution) throws Exception {
     log.info("work reject define: {}", delegateExecution.getProcessBusinessKey());
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionId(delegateExecution.getProcessDefinitionId())
-        .singleResult();
     processChangeService.statusChange(Long.parseLong(delegateExecution.getProcessBusinessKey()),
-        WorkStatus.REJECT, processDefinition.getId());
+        WorkStatus.REJECT, delegateExecution.getProcessDefinitionId());
 
   }
 }

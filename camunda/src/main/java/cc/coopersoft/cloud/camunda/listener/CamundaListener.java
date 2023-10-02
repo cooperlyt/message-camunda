@@ -61,9 +61,6 @@ public class CamundaListener {
   public void onTaskEvent(TaskEvent taskEvent) {
     log.debug("immutable task event: {} by TaskEvent", taskEvent.getEventName());
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionId(taskEvent.getProcessDefinitionId())
-        .singleResult();
 
     Task task = taskService.createTaskQuery().taskId(taskEvent.getId()).initializeFormKeys().singleResult();
 
@@ -83,7 +80,7 @@ public class CamundaListener {
               .taskName(task.getName())
               .taskId(taskEvent.getId())
               .build(),
-          processDefinition.getId());
+          taskEvent.getProcessDefinitionId());
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
