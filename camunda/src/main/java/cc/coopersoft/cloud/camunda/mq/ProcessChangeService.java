@@ -32,6 +32,7 @@ public class ProcessChangeService {
     if (!streamBridge.send("statusChangeChannel-out-0",msg)){
       throw new Exception("message send fail!");
     }
+    log.info("status change mq is send: {} -> {}",workId,status);
   }
 
   public void processChange(WorkChangeMessage changeMessage,String processDefinitionId) throws Exception {
@@ -41,14 +42,15 @@ public class ProcessChangeService {
     if (!streamBridge.send("processChangeChannel-out-0",msg)){
       throw new Exception("message send fail!");
     }
+    log.info("process change  mq is send : {}",changeMessage);
   }
 
   private String getDefineId(String processDefinitionId){
     ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
         .processDefinitionId(processDefinitionId)
         .singleResult();
-    log.debug("process define id: {}, key: {}",definition.getId(),definition.getKey());
-    return definition.getId();
+    log.info("process define id: {}, key: {}",definition.getId(),definition.getKey());
+    return definition.getKey();
   }
 
 }

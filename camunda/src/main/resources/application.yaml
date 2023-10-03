@@ -245,4 +245,4 @@ logging:
     com.netflix: WARN
     org.springframework.web: WARN
     org.springframework.security: WARN
-    cc.coopersoft: WARN
+    cc.coopersoft: INFO
